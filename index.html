@@ -1,0 +1,631 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Untuk Wali Kelas Kami | Harapan & Doa</title>
+
+    <!-- Framework & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;500;600&family=Dancing+Script:wght@700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      :root {
+        --cream: #fdfaf6;
+        --gold: #d4af37;
+        --soft-blue: #e0f2f1;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--cream);
+        color: #3e3e3e;
+        overflow-x: hidden;
+        overflow-y: hidden; /* Locked initially */
+      }
+
+      .font-serif {
+        font-family: "Playfair Display", serif;
+      }
+      .font-hand {
+        font-family: "Dancing Script", cursive;
+      }
+
+      /* Premium Glassmorphism */
+      .glass {
+        background: rgba(255, 255, 255, 0.35);
+        backdrop-filter: blur(20px) saturate(160%);
+        -webkit-backdrop-filter: blur(20px) saturate(160%);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Bokeh & Ambient Light */
+      .bokeh {
+        position: fixed;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: -1;
+        filter: blur(80px);
+        opacity: 0.5;
+        animation: pulse 10s infinite alternate ease-in-out;
+      }
+      @keyframes pulse {
+        from {
+          transform: scale(1);
+          opacity: 0.4;
+        }
+        to {
+          transform: scale(1.2);
+          opacity: 0.6;
+        }
+      }
+
+      /* Scroll Indicator */
+      .scroll-indicator {
+        position: fixed;
+        bottom: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        z-index: 100;
+        opacity: 0;
+        transition: opacity 1s;
+      }
+      .mouse-dot {
+        width: 2px;
+        height: 35px;
+        background: linear-gradient(to bottom, var(--gold), transparent);
+        animation: scrollAnim 2s infinite;
+      }
+      @keyframes scrollAnim {
+        0% {
+          transform: scaleY(0);
+          transform-origin: top;
+        }
+        50% {
+          transform: scaleY(1);
+          transform-origin: top;
+        }
+        51% {
+          transform: scaleY(1);
+          transform-origin: bottom;
+        }
+        100% {
+          transform: scaleY(0);
+          transform-origin: bottom;
+        }
+      }
+
+      /* Countdown Box */
+      .timer-unit {
+        background: rgba(255, 255, 255, 0.5);
+        border: 1px solid rgba(212, 175, 55, 0.2);
+        width: 75px;
+        height: 95px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 20px;
+      }
+      @media (min-width: 768px) {
+        .timer-unit {
+          width: 100px;
+          height: 120px;
+        }
+      }
+
+      .typing-cursor::after {
+        content: "|";
+        animation: blink 1s infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      #main-app {
+        display: none;
+      }
+    </style>
+  </head>
+  <body class="selection:bg-amber-100">
+    <!-- Ambient Lights -->
+    <div
+      class="bokeh w-72 h-72 md:w-[600px] md:h-[600px] bg-orange-100 top-[-10%] left-[-10%]"
+    ></div>
+    <div
+      class="bokeh w-64 h-64 md:w-[500px] md:h-[500px] bg-blue-50 bottom-[-10%] right-[-10%]"
+    ></div>
+
+    <!-- SCROLL GUIDE -->
+    <div id="scroll-guide" class="scroll-indicator">
+      <span
+        class="text-[9px] tracking-[0.4em] uppercase text-amber-700/60 font-bold"
+        >Gulir Perlahan</span
+      >
+      <div class="mouse-dot"></div>
+    </div>
+
+    <!-- LOCK SCREEN SECTION -->
+    <section
+      id="lock-screen"
+      class="fixed inset-0 z-[1000] flex items-center justify-center p-6 bg-white/40 backdrop-blur-2xl"
+    >
+      <div class="max-w-3xl w-full text-center">
+        <h4
+          class="text-[10px] md:text-xs tracking-[0.7em] uppercase text-amber-600 font-bold mb-6"
+        >
+          Pesan yang Dinantikan
+        </h4>
+        <h1
+          class="text-4xl md:text-7xl font-serif text-gray-800 mb-6 leading-tight"
+        >
+          Menunggu <br /><span class="italic">Saat yang Tepat</span>
+        </h1>
+        <p
+          class="text-gray-400 italic mb-12 text-xs md:text-sm px-6 leading-relaxed"
+        >
+          Satu tahun telah berlalu, dan ada sesuatu yang ingin kami sampaikan.
+          Terkunci hingga 19 Juni 2026.
+        </p>
+
+        <!-- Luxury Countdown -->
+        <div class="flex justify-center gap-3 md:gap-6 mb-16">
+          <div class="timer-unit">
+            <span id="d" class="text-2xl md:text-4xl font-serif text-amber-700"
+              >00</span
+            >
+            <span
+              class="text-[8px] md:text-[10px] uppercase tracking-widest text-gray-400 mt-1"
+              >Hari</span
+            >
+          </div>
+          <div class="timer-unit">
+            <span id="h" class="text-2xl md:text-4xl font-serif text-amber-700"
+              >00</span
+            >
+            <span
+              class="text-[8px] md:text-[10px] uppercase tracking-widest text-gray-400 mt-1"
+              >Jam</span
+            >
+          </div>
+          <div class="timer-unit">
+            <span id="m" class="text-2xl md:text-4xl font-serif text-amber-700"
+              >00</span
+            >
+            <span
+              class="text-[8px] md:text-[10px] uppercase tracking-widest text-gray-400 mt-1"
+              >Menit</span
+            >
+          </div>
+          <div class="timer-unit">
+            <span id="s" class="text-2xl md:text-4xl font-serif text-amber-700"
+              >00</span
+            >
+            <span
+              class="text-[8px] md:text-[10px] uppercase tracking-widest text-gray-400 mt-1"
+              >Detik</span
+            >
+          </div>
+        </div>
+
+        <div
+          id="unlock-container"
+          class="opacity-0 translate-y-10 transition-all duration-1000"
+        >
+          <button
+            onclick="unlockApp()"
+            class="bg-amber-800 text-white px-12 md:px-20 py-4 md:py-5 rounded-full tracking-[0.4em] font-bold text-[10px] hover:bg-amber-900 transition-all shadow-2xl"
+          >
+            BUKA PESAN KAMI
+          </button>
+        </div>
+
+        <button
+          onclick="unlockApp()"
+          class="mt-20 text-[9px] text-gray-300 uppercase tracking-widest hover:text-amber-500 transition-colors"
+        >
+          Mode Demo (Lewati Timer)
+        </button>
+      </div>
+    </section>
+
+    <!-- MAIN CONTENT APP -->
+    <main id="main-app" class="relative z-10 opacity-0">
+      <!-- Header -->
+      <nav
+        class="fixed top-0 w-full h-20 flex items-center justify-between px-6 md:px-20 z-[60] pointer-events-none"
+      >
+        <div
+          id="clock"
+          class="text-[9px] tracking-[0.4em] font-bold text-gray-400 uppercase"
+        >
+          00:00:00
+        </div>
+        <div
+          class="text-[9px] tracking-[0.4em] font-bold text-gray-400 uppercase hidden md:block italic"
+        >
+          Sembah Bakti Wali Kelas
+        </div>
+      </nav>
+
+      <!-- Intro Animation Section -->
+      <section
+        class="h-screen flex items-center justify-center p-6 text-center"
+        id="intro-sec"
+      >
+        <div
+          id="intro-type"
+          class="text-xl md:text-4xl font-serif text-gray-700 leading-relaxed italic max-w-4xl min-h-[100px]"
+        ></div>
+      </section>
+
+      <!-- The Emotional Letter -->
+      <section
+        class="min-h-screen py-20 px-4 md:px-6 flex items-center justify-center"
+      >
+        <div
+          class="max-w-5xl w-full glass rounded-[40px] md:rounded-[80px] p-8 md:p-24 text-center relative overflow-hidden"
+        >
+          <h2
+            class="text-[10px] tracking-[0.7em] uppercase text-amber-600 mb-8 font-bold"
+          >
+            Sebuah Kesan & Harapan
+          </h2>
+          <h3
+            class="text-4xl md:text-8xl font-serif text-gray-800 mb-12 leading-tight"
+          >
+            Untuk <br /><span
+              class="font-hand text-amber-700 normal-case text-5xl md:text-9xl"
+              >Wali Kelas Kami</span
+            >
+          </h3>
+
+          <div
+            id="letter-content"
+            class="space-y-10 md:space-y-14 text-base md:text-2xl text-gray-600 font-light italic leading-relaxed"
+          >
+            <!-- Lines Injected -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Hope & Future Section -->
+      <section class="py-20 md:py-40 px-6 bg-white/20">
+        <div
+          class="max-w-4xl mx-auto glass p-10 md:p-20 rounded-[50px] text-center border-gold/10 border italic"
+        >
+          <h4
+            class="font-serif text-3xl md:text-5xl text-gray-800 mb-10 italic"
+          >
+            Ini Bukan Perpisahan...
+          </h4>
+          <p
+            class="text-lg md:text-2xl text-gray-500 font-light leading-relaxed mb-8"
+          >
+            Satu tahun perjalanan mungkin terasa singkat, namun jejak
+            bimbinganmu tertanam sangat dalam di hati kami.
+          </p>
+          <div class="w-16 h-[1px] bg-gold mx-auto mb-10"></div>
+          <p
+            class="text-xl md:text-3xl text-amber-800 font-serif leading-relaxed"
+          >
+            "Kami menyimpan satu harapan besar... Semoga di tahun depan, pintu
+            kelas kami kembali terbuka oleh kehadiranmu sebagai wali kelas kami
+            lagi."
+          </p>
+        </div>
+      </section>
+
+      <!-- Memory Display -->
+      <section class="py-32 px-6">
+        <div
+          class="flex flex-wrap justify-center gap-10 md:gap-16 max-w-6xl mx-auto"
+        >
+          <div
+            class="glass p-3 rounded-3xl rotate-[-2deg] w-64 md:w-80 transition-transform hover:rotate-0 duration-700"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=600"
+              class="w-full h-64 md:h-80 object-cover rounded-2xl grayscale hover:grayscale-0 transition-all"
+            />
+            <p class="font-hand text-center text-xl mt-4 italic">
+              Bimbingan yang Sabar
+            </p>
+          </div>
+          <div
+            class="glass p-3 rounded-3xl rotate-[2deg] w-64 md:w-80 transition-transform hover:rotate-0 duration-700"
+          >
+            <img
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&q=80&w=600"
+              class="w-full h-64 md:h-80 object-cover rounded-2xl grayscale hover:grayscale-0 transition-all"
+            />
+            <p class="font-hand text-center text-xl mt-4 italic">
+              Tawa di Ruang Kelas
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Interactive Question -->
+      <section class="py-20 md:py-40 flex flex-col items-center px-4">
+        <div
+          class="glass max-w-2xl w-full p-12 md:p-20 rounded-[40px] md:rounded-[60px] text-center"
+        >
+          <h5
+            class="font-serif text-2xl md:text-3xl mb-12 text-gray-800 italic"
+          >
+            Tebak Siapa?
+          </h5>
+          <div class="min-h-[100px] flex items-center justify-center">
+            <p
+              id="quiz-msg"
+              class="text-lg md:text-2xl text-gray-600 italic"
+            ></p>
+          </div>
+          <button
+            onclick="handleQuiz()"
+            id="quiz-btn"
+            class="mt-12 text-[10px] font-bold tracking-[0.5em] uppercase text-amber-800 border-b border-amber-800 pb-2"
+          >
+            Lanjut
+          </button>
+
+          <div
+            id="big-reveal"
+            class="hidden mt-16 scale-50 opacity-0 transition-all duration-1000"
+          >
+            <p
+              class="text-[10px] tracking-[0.5em] uppercase text-gray-400 mb-4"
+            >
+              Orang Tua Kedua Kami,
+            </p>
+            <h6 class="text-6xl md:text-9xl font-serif text-amber-700 italic">
+              Wali Kelas.
+            </h6>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="py-24 text-center px-6">
+        <div class="w-12 h-[1px] bg-amber-200 mx-auto mb-8"></div>
+        <p
+          class="max-w-md mx-auto italic text-gray-400 text-xs md:text-sm leading-relaxed mb-8"
+        >
+          “Ibu adalah alasan kenapa kami merasa sekolah adalah rumah kedua. Kami
+          menantikan bimbinganmu kembali di masa depan.”
+        </p>
+        <p
+          class="text-[9px] tracking-[0.6em] font-bold text-amber-700 uppercase"
+        >
+          Dibuat dengan segenap hormat oleh Murid-Muridmu
+        </p>
+      </footer>
+    </main>
+
+    <!-- Audio Theme -->
+    <audio id="bg-audio" loop>
+      <source
+        src="https://www.chosic.com/wp-content/uploads/2021/04/Warm-Memories-Emotional-Inspiring-Piano.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <!-- Easter Egg Popup -->
+    <div
+      id="egg"
+      class="fixed inset-0 z-[1001] hidden items-center justify-center bg-black/5 backdrop-blur-xl"
+    >
+      <div class="glass p-12 rounded-3xl text-center max-w-sm mx-4">
+        <span class="text-4xl">✨</span>
+        <p class="font-serif italic text-gray-700 mt-6 leading-relaxed">
+          “Terima kasih telah menjadi pelita di masa muda kami. Semoga semesta
+          mempertemukan kita kembali tahun depan.”
+        </p>
+        <button
+          onclick="closeEgg()"
+          class="mt-8 text-[10px] font-bold tracking-widest uppercase text-amber-800"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden Egg Trigger -->
+    <div
+      onclick="catchEgg()"
+      class="fixed top-8 right-8 z-[1100] cursor-pointer opacity-10 hover:opacity-100 transition-opacity"
+    >
+      ✨
+    </div>
+
+    <script>
+      // 1. COUNTDOWN (19 Juni 2026)
+      const target = new Date("June 19, 2026 00:00:00").getTime();
+      function updateTimer() {
+        const now = new Date().getTime();
+        const diff = target - now;
+        if (diff <= 0) {
+          document
+            .getElementById("unlock-container")
+            .classList.replace("opacity-0", "opacity-100");
+          document
+            .getElementById("unlock-container")
+            .classList.replace("translate-y-10", "translate-y-0");
+          return;
+        }
+        const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const s = Math.floor((diff % (1000 * 60)) / 1000);
+        document.getElementById("d").innerText = d.toString().padStart(2, "0");
+        document.getElementById("h").innerText = h.toString().padStart(2, "0");
+        document.getElementById("m").innerText = m.toString().padStart(2, "0");
+        document.getElementById("s").innerText = s.toString().padStart(2, "0");
+      }
+      setInterval(updateTimer, 1000);
+      updateTimer();
+
+      // 2. UNLOCK & TRANSITION
+      function unlockApp() {
+        document.getElementById("bg-audio").play();
+        const tl = gsap.timeline();
+        tl.to("#lock-screen", {
+          opacity: 0,
+          scale: 1.1,
+          duration: 1.5,
+          ease: "power2.inOut",
+        })
+          .set("#lock-screen", { display: "none" })
+          .set("#main-app", { display: "block" })
+          .to("#main-app", { opacity: 1, duration: 1.5 })
+          .to("#scroll-guide", { opacity: 1, duration: 1 })
+          .add(async () => {
+            document.body.style.overflowY = "auto";
+            await runIntro();
+          });
+      }
+
+      // 3. TYPING ENGINE
+      async function typeEffect(el, text, speed = 50) {
+        el.innerHTML = "";
+        el.classList.add("typing-cursor");
+        for (const char of text) {
+          el.innerHTML += char;
+          await new Promise((r) => setTimeout(r, speed));
+        }
+        el.classList.remove("typing-cursor");
+      }
+
+      async function runIntro() {
+        const el = document.getElementById("intro-type");
+        const lines = [
+          "Satu tahun telah kita lalui bersama...",
+          "Ada banyak tawa, namun ada juga kesalahan kami yang kau maafkan.",
+          "Terima kasih telah menjadi lebih dari sekadar guru bagi kami.",
+          "Engkaulah Wali Kelas yang kami sayangi.",
+        ];
+        for (const line of lines) {
+          await typeEffect(el, line, 60);
+          await new Promise((r) => setTimeout(r, 2000));
+          if (line !== lines[lines.length - 1]) el.innerHTML = "";
+        }
+        startMainLetter();
+      }
+
+      async function startMainLetter() {
+        createPetals();
+        const el = document.getElementById("letter-content");
+        const messages = [
+          "Bapak/Ibu... terima kasih telah bertahan menghadapi kami selama ini.",
+          "Mungkin tahun ajaran ini akan segera berganti,",
+          "Namun kasih sayang dan bimbinganmu selalu membekas di hati kami.",
+          "Kami belum siap jika harus kehilangan sosok orang tua sepertimu di sekolah.",
+          "Nasihatmu adalah kompas yang menuntun masa depan kami.",
+          "Karena itu, kami menyimpan satu doa dan harapan tulus...",
+          "Semoga tahun depan, kami masih bisa melihatmu berdiri di depan kelas sebagai wali kelas kami lagi.",
+        ];
+        for (const line of messages) {
+          const p = document.createElement("p");
+          p.className =
+            "opacity-0 translate-y-6 transition-all duration-1000 px-2";
+          el.appendChild(p);
+          await typeEffect(p, line, 45);
+          p.classList.remove("opacity-0", "translate-y-6");
+          await new Promise((r) => setTimeout(r, 1200));
+        }
+        startInteractive();
+      }
+
+      // 4. INTERACTIVE QUIZ
+      const quizItems = [
+        "Siapa yang tetap sabar saat kami sulit diatur?",
+        "Siapa yang selalu mendengarkan keluh kesah kami dengan hati?",
+        "Siapa sosok yang kami harap kembali memimpin kelas kami tahun depan?",
+      ];
+      let qIdx = 0;
+      async function startInteractive() {
+        await typeEffect(document.getElementById("quiz-msg"), quizItems[0], 50);
+      }
+      async function handleQuiz() {
+        qIdx++;
+        if (qIdx < quizItems.length) {
+          await typeEffect(
+            document.getElementById("quiz-msg"),
+            quizItems[qIdx],
+            50,
+          );
+        } else {
+          document.getElementById("quiz-btn").style.display = "none";
+          document.getElementById("quiz-msg").innerHTML = "Beliau adalah...";
+          await new Promise((r) => setTimeout(r, 1500));
+          const reveal = document.getElementById("big-reveal");
+          reveal.classList.remove("hidden");
+          gsap.to(reveal, {
+            opacity: 1,
+            scale: 1,
+            duration: 2,
+            ease: "elastic.out(1, 0.3)",
+          });
+        }
+      }
+
+      // 5. VISUAL DECORATIONS
+      function createPetals() {
+        setInterval(() => {
+          const p = document.createElement("div");
+          p.className = "fixed text-amber-200 pointer-events-none z-[50]";
+          p.innerHTML = "🌸";
+          p.style.left = Math.random() * 100 + "vw";
+          p.style.top = "-5vh";
+          p.style.fontSize = Math.random() * 10 + 10 + "px";
+          document.body.appendChild(p);
+          gsap.to(p, {
+            y: "110vh",
+            x: (Math.random() - 0.5) * 200,
+            rotation: Math.random() * 360,
+            duration: Math.random() * 8 + 7,
+            ease: "none",
+            onComplete: () => p.remove(),
+          });
+        }, 1000);
+      }
+
+      // 6. UTILITIES
+      window.addEventListener("scroll", () => {
+        const prompt = document.getElementById("scroll-guide");
+        if (window.scrollY > 100) prompt.style.opacity = "0";
+        else prompt.style.opacity = "1";
+      });
+
+      setInterval(() => {
+        document.getElementById("clock").innerText =
+          new Date().toLocaleTimeString("id-ID", { hour12: false });
+      }, 1000);
+
+      let clicks = 0;
+      function catchEgg() {
+        clicks++;
+        if (clicks >= 5) {
+          document.getElementById("egg").classList.replace("hidden", "flex");
+          clicks = 0;
+        }
+      }
+      function closeEgg() {
+        document.getElementById("egg").classList.replace("flex", "hidden");
+      }
+    </script>
+  </body>
+</html>
